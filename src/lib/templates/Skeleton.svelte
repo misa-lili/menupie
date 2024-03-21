@@ -6,14 +6,14 @@
 <main>
   <section id="title">
     <h1>
-      {$menu.data.title?.value || "새로운 타이틀"}
+      {@html $menu.data.title?.value || "새로운 타이틀"}
     </h1>
   </section>
 
   <section id="headers">
     {#each $menu.data.headers || [] as header}
       <div>
-        {header.value || "새로운 헤더"}
+        {@html header.value}
       </div>
     {/each}
   </section>

@@ -5,7 +5,7 @@
 
   let menu = JSON.parse(JSON.stringify(get(storeMenu)))
   let focused = {
-    id: "a",
+    id: "",
     arr: [],
     idx: 0,
   }
@@ -168,6 +168,27 @@
     focused.arr.splice(focused.idx, 1)
     menu = menu
   }
+
+  // <img> 태그를 텍스트로 변환
+  function convertImgToText(imgTag: string) {
+    return String(imgTag).replaceAll(/</g, "&lt;").replaceAll(/>/g, "&gt;")
+  }
+
+  // 텍스트를 <img> 태그로 변환
+  function convertTextToImg(text: string) {
+    return String(text).replaceAll(/&lt;/g, "<").replaceAll(/&gt;/g, ">")
+  }
+
+  function toggleHTML() {
+    const target = focused.arr[focused.idx]
+    const prop = target.value ? "value" : "name"
+    if (target[prop].includes("<")) {
+      target[prop] = convertImgToText(target[prop])
+    } else {
+      target[prop] = convertTextToImg(target[prop])
+    }
+    menu = menu
+  }
 </script>
 
 <div
@@ -181,12 +202,13 @@
   <button on:mousedown|preventDefault={() => move(-1)}>🔼</button>
   <button on:mousedown|preventDefault={() => move(1)}>🔽</button>
   <button on:mousedown|preventDefault={toggleOut}>⛔️</button>
+  <button on:mousedown|preventDefault={toggleHTML}>🖼️</button>
   <button on:mousedown|preventDefault={deleteFocused}>🗑️</button>
 </div>
 
 <main>
   <section id="title">
-    <h1 contenteditable="true" bind:innerText={menu.data.title.value} />
+    <h1 contenteditable="true" bind:innerHTML={menu.data.title.value} />
   </section>
 
   <section id="headers">
@@ -194,7 +216,7 @@
       <div
         class:out-of-stock={header.out}
         contenteditable="true"
-        bind:innerText={header.value}
+        bind:innerHTML={header.value}
         id={header.id}
         on:focus={() => focus(menu.data.headers, idx, header.id)}
         on:blur={blur}
@@ -210,12 +232,12 @@
           <h2
             class:out-of-stock={group.out}
             contenteditable="true"
-            bind:innerText={group.name}
+            bind:innerHTML={group.name}
             id={group.id}
             on:focus={() => focus(menu.data.groups, idx, group.id)}
             on:blur={blur}
           />
-          <span contenteditable="true" bind:innerText={group.col} />
+          <span contenteditable="true" bind:innerHTML={group.col} />
         </div>
         {#each group.items || [] as item, idx (item.id)}
           <div class="item">
@@ -223,14 +245,14 @@
               <h3
                 class:out-of-stock={item.out}
                 contenteditable="true"
-                bind:innerText={item.name}
+                bind:innerHTML={item.name}
                 id={item.id}
                 on:focus={() => focus(group.items, idx, item.id)}
                 on:blur={blur}
               />
-              <div contenteditable="true" bind:innerText={item.price} />
+              <div contenteditable="true" bind:innerHTML={item.price} />
             </div>
-            <div contenteditable="true" bind:innerText={item.description} />
+            <div contenteditable="true" bind:innerHTML={item.description} />
           </div>
         {/each}
         <button on:click={() => insertItem(group)}>아이템추가</button>
@@ -244,7 +266,7 @@
       <div
         class:out-of-stock={footer.out}
         contenteditable="true"
-        bind:innerText={footer.value}
+        bind:innerHTML={footer.value}
         id={footer.id}
         on:focus={() => focus(menu.data.footers, idx, footer.id)}
         on:blur={blur}
