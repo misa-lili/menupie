@@ -13,3 +13,14 @@ type GoogleTokenPayload = {
   picture: string
   sub: string
 }
+
+type TokenPayload = Partial<GoogleTokenPayload> & {
+  email: string
+  name: string
+  picture: string
+}
+
+type MenuHandle = {
+  id: number
+  key: string
+}

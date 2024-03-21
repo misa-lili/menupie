@@ -1,8 +1,16 @@
 type Menu = {
+  id: number
+  key: string
+  email: string
+  data: MenuData
+}
+
+type MenuData = {
   title: Title
   headers: Header[]
   groups: Group[]
   footers: Footer[]
+  template: string
   scripts: string[]
   styles: string[]
 }
@@ -14,14 +22,12 @@ type Group = {
   name: string
   col?: string
   items: Item[]
-  groups: Group[]
 }
 type Item = {
   id?: string
   name: string
   price: string
   description?: string
-  image?: string
   out?: boolean
 }
 type Footer = { id?: string; value: string }

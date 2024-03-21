@@ -1,0 +1,4 @@
+[Debug] [vite] connecting... (client, line 469)
+[Debug] [vite] connected. (client, line 574)
+[Debug] [vite] hot updated: /src/lib/templates/Editor.svelte (client, line 225)
+[Debug] [vite] hot updated: /src/app.css (client, line 225)

@@ -1,6 +1,7 @@
 import { jwtVerify, importJWK } from "jose"
 import getGooglePublicKeys from "./getGooglePublicKey"
-import { WEB_GOOGLE_CLIENT_ID, ADMIN_EMAILS } from "$env/static/private"
+import { ADMIN_EMAILS } from "$env/static/private"
+import { PUBLIC_WEB_GOOGLE_CLIENT_ID } from "$env/static/public"
 import { error } from "@sveltejs/kit"
 
 /** 구글 토큰을 verify 합니다.
@@ -8,15 +9,17 @@ import { error } from "@sveltejs/kit"
  */
 export default async function verifyToken(
   token: string | undefined,
-): Promise<{ isAdmin: boolean } & GoogleTokenPayload> {
-  if (!token) error(401, "No token provided")
+): Promise<TokenPayload> {
+  const errorPayload = { email: "", name: "", picture: "" }
+
+  if (!token) return errorPayload
 
   try {
     const publicKeys = await getGooglePublicKeys()
     const keyOptions = {
       algorithms: ["RS256"],
       issuer: "https://accounts.google.com",
-      audience: WEB_GOOGLE_CLIENT_ID,
+      audience: PUBLIC_WEB_GOOGLE_CLIENT_ID,
     }
 
     for (const key of publicKeys.keys) {
@@ -34,7 +37,6 @@ export default async function verifyToken(
 
         return {
           ...payload,
-          isAdmin: ADMIN_EMAILS.split(",").includes(payload.email),
         }
       } catch (verificationError) {
         console.log(
@@ -48,6 +50,6 @@ export default async function verifyToken(
     // 모든 키로 검증 실패 시 에러 throw
     throw new Error("Invalid token")
   } catch (unknownError) {
-    throw error(401, String(unknownError))
+    return errorPayload
   }
 }
