@@ -30,6 +30,7 @@ cat <<EOF >$SERVICE_FILE
 Description=$SERVICE_NAME
 
 [Service]
+Environment=PORT=80
 ExecStart=/usr/bin/node $DIR/build
 Restart=always
 User=$(whoami)
