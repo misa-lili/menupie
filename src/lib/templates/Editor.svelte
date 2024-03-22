@@ -278,7 +278,7 @@
 
 <style>
   main {
-    @apply container mx-auto mt-16 mb-24 w-full sm:w-4/5 md:w-3/4 lg:w-2/3 xl:w-[40%];
+    @apply container mx-auto mt-16 mb-24 px-6 w-full sm:w-4/5 md:w-3/4 lg:w-2/3 xl:w-[40%];
   }
 
   section {

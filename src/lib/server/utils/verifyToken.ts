@@ -1,8 +1,6 @@
 import { jwtVerify, importJWK } from "jose"
 import getGooglePublicKeys from "./getGooglePublicKey"
-import { ADMIN_EMAILS } from "$env/static/private"
 import { PUBLIC_WEB_GOOGLE_CLIENT_ID } from "$env/static/public"
-import { error } from "@sveltejs/kit"
 
 /** 구글 토큰을 verify 합니다.
  * 또한 admin email에 포함될 경우 isAdmin을 true로 설정합니다.

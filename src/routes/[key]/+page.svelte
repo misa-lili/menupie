@@ -43,15 +43,13 @@
   }
 </script>
 
-<div class:hidden={!data.tokenPayload.email}>
+<div class:hidden={!data.tokenPayload.email || !$isOwner}>
   <select bind:value={currentTemplate}>
     <option value="Skeleton">Skeleton</option>
     <option value="Dosisool">Dosisool</option>
     <option value="Editor">Editor</option>
   </select>
-  <button on:click={saveTemplate}>템플릿 변경</button>
-  <span> 👀 </span>
-  <span> 🕶️ </span>
+  <button on:click={saveTemplate}>💾</button>
 </div>
 
 <svelte:component this={template[currentTemplate]} />

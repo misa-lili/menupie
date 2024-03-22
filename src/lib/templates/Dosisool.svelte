@@ -9,7 +9,9 @@
     const style = `
       html, body {
         color: rgba(205, 156, 112, 0.8);
-        background: linear-gradient(to right, #2f372e, #252d24);
+        /* background: linear-gradient(to bottom, #2f372e, #252d24, #1c2219, #2f372e); */
+        background-color: #2f372e;
+        -webkit-overflow-scrolling: touch;
       }
     `
 
@@ -35,7 +37,7 @@
   <section id="headers">
     {#each $menu.data.headers || [] as header}
       <div>
-        {header.value || "새로운 헤더"}
+        {@html header.value || "새로운 헤더"}
       </div>
     {/each}
   </section>
@@ -44,21 +46,21 @@
     {#each $menu.data.groups || [] as group}
       <div class="group">
         <h2>
-          {group.name || ""}
-          {group.col || ""}
+          {@html group.name || ""}
+          {@html group.col || ""}
         </h2>
         {#each group.items || [] as item}
           <div class="item">
             <div class="between">
               <h3>
-                {item.name}
+                {@html item.name}
               </h3>
               <div>
-                {item.price}
+                {@html item.price}
               </div>
             </div>
             <p>
-              {item.description}
+              {@html item.description}
             </p>
           </div>
         {/each}
@@ -71,7 +73,7 @@
 
 <style>
   main {
-    @apply container mx-auto my-12 w-full sm:w-4/5 md:w-3/4 lg:w-2/3 xl:w-[40%];
+    @apply container mx-auto mt-16 mb-24 px-6 w-full sm:w-4/5 md:w-3/4 lg:w-2/3 xl:w-[40%];
   }
 
   section {

@@ -3,20 +3,24 @@
   import { onMount } from "svelte"
   import {
     PUBLIC_WEB_GOOGLE_CLIENT_ID,
-    PUBLIC_WEB_GOOGLE_REDIRECT_URI,
+    PUBLIC_WEB_GOOGLE_REDIRECT_PATH,
   } from "$env/static/public"
-  import { menus, tokenPayload } from "$lib/store"
+  import { menus, tokenPayload, isAdmin } from "$lib/store"
 
   let isOpen = false
 
   async function login() {
+    const redirectUri = window.location.origin + PUBLIC_WEB_GOOGLE_REDIRECT_PATH
+    console.log(redirectUri)
+
     const url = new URL("https://accounts.google.com/o/oauth2/v2/auth")
     url.searchParams.append("client_id", PUBLIC_WEB_GOOGLE_CLIENT_ID)
-    url.searchParams.append("redirect_uri", PUBLIC_WEB_GOOGLE_REDIRECT_URI)
+    url.searchParams.append("redirect_uri", redirectUri)
     url.searchParams.append("response_type", "code")
     url.searchParams.append("scope", "email profile")
     url.searchParams.append("access_type", "offline")
     url.searchParams.append("prompt", "consent")
+    url.searchParams.append("state", window.location.href)
 
     window.location = url.toString()
   }
@@ -50,41 +54,62 @@
     await goto(key)
     window.location.reload()
   }
+
+  function open(event) {
+    event.stopPropagation()
+    isOpen = true
+  }
+
+  function close() {
+    isOpen = false
+  }
+
+  function clickOutside(element, callbackFunction) {
+    function onClick(event) {
+      if (!element.contains(event.target)) {
+        callbackFunction()
+      }
+    }
+
+    document.body.addEventListener("click", onClick)
+
+    return {
+      update(newCallbackFunction) {
+        callbackFunction = newCallbackFunction
+      },
+      destroy() {
+        document.body.removeEventListener("click", onClick)
+      },
+    }
+  }
 </script>
 
-<span
-  class:hidden={isOpen}
-  class="fixed top-0 right-0"
-  on:click={() => {
-    isOpen = true
-  }}>️⬅️</span
->
+{#if !$tokenPayload.email}
+  <icon
+    class:hidden={isOpen}
+    class="fixed top-0 right-0 cursor-pointer m-6"
+    on:click={login}
+  >
+    <img
+      class="grayscale opacity-50"
+      src="https://lh3.googleusercontent.com/COxitqgJr1sJnIDe8-jiKhxDx1FrYbtRHKJ9z_hELisAlapwE9LUPh6fcXIfb5vwpbMl4xl9H9TRFPc5NOO8Sb3VSgIBrfRYvW6cUA"
+    />
+  </icon>
+{:else}
+  <icon
+    class:hidden={isOpen}
+    class="fixed top-0 right-0 cursor-pointer m-6"
+    on:click={open}
+  >
+    <img src={$tokenPayload.picture} alt={$tokenPayload.name} />
+  </icon>
+{/if}
+
 <sheet
   class:right-0={isOpen}
   class:-right-[300px]={!isOpen}
-  class="transition-all"
+  use:clickOutside={close}
 >
-  <span
-    class:hidden={!isOpen}
-    class="absolute left-0 top-0"
-    on:click={() => {
-      isOpen = false
-    }}>➡️</span
-  >
-
-  <section id="login">
-    {#if $tokenPayload?.email}
-      <img src={$tokenPayload.picture} alt={$tokenPayload.name} />
-      <div>
-        👋<button on:click={logout}>Logout</button>
-      </div>
-    {:else}
-      <button type="submit" value="Login with Google" on:click={login}>
-        Login with Google
-      </button>
-    {/if}
-  </section>
-
   {#if $menus?.length > 0}
     <section id="menu-list">
       <h2>your menu list</h2>
@@ -97,24 +122,17 @@
     </section>
   {/if}
 
-  {#if $tokenPayload?.email}
-    <section id="create-menu">
-      <button on:click={createMenu}>create menu</button>
-    </section>
-  {/if}
+  <section id="create-menu">
+    <button on:click={createMenu}>create menu</button>
+  </section>
 
-  <section id="footer">
+  <section id="logout">
     <div>
-      <a href="https://github.com/misa-lili/qqur"
-        >https://github.com/misa-lili/qqur</a
-      >
-    </div>
-    <div>
-      <a href="mailto:kyom@misalili.com?subject=[qqur]">kyom@misalili.com</a>
+      👋<button on:click={logout}>Logout</button>
     </div>
   </section>
 
-  {#if $tokenPayload.isAdmin === true}
+  {#if $isAdmin === true}
     <h3>admin panel</h3>
     <div>
       <button
@@ -135,14 +153,8 @@
 
 <style>
   sheet {
-    position: fixed;
-    top: 0px;
-    width: 300px;
-    height: 100%;
-    margin: 0px;
-    padding: 1rem 2rem;
-    border-left: 1px solid #000;
-    background-color: inherit;
+    @apply fixed top-0 w-[300px] h-full shadow-lg m-0 py-4 px-8;
+    @apply transition-all text-black h-full rounded-l-3xl bg-slate-100;
   }
 
   section {
