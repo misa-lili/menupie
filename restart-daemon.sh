@@ -14,11 +14,11 @@ else
 fi
 
 # 의존성을 설치합니다.
-echo "Installing dependencies with bun..."
+echo "Installing dependencies with npm..."
 npm install
 
 # 프로젝트를 컴파일합니다.
-echo "Compiling project with bun..."
+echo "Compiling project with npm..."
 npm run build 
 
 # systemd 서비스 파일을 동적으로 생성합니다.
@@ -30,7 +30,7 @@ cat <<EOF >$SERVICE_FILE
 Description=$SERVICE_NAME
 
 [Service]
-ExecStart=$DIR/$SERVICE_NAME
+ExecStart=/usr/bin/node $DIR/build
 Restart=always
 User=$(whoami)
 Group=$(id -gn $(whoami))
