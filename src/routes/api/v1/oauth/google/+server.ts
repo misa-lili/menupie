@@ -6,7 +6,8 @@ import {
 
 export const GET = async ({ url }) => {
   const TOKEN_URI = "https://oauth2.googleapis.com/token"
-  const redirectUri = url.origin + PUBLIC_WEB_GOOGLE_REDIRECT_PATH
+  const state = url.searchParams.get("state") || "/"
+  const redirectUri = new URL(state).origin + PUBLIC_WEB_GOOGLE_REDIRECT_PATH
 
   const params = new URLSearchParams()
   params.append("code", url.searchParams.get("code") as string)
@@ -25,16 +26,14 @@ export const GET = async ({ url }) => {
 
   const body = await tokenResponse.json()
   if (tokenResponse.status !== 200) {
-    console.log(redirectUri)
+    console.log("redirectUri", redirectUri)
+    console.log("state", state)
     console.log(body)
   }
 
   const token: string = body.id_token
 
   const headers = new Headers()
-  const state = url.searchParams.get("state") || "/"
-  console.log("token", token)
-  console.log("state", state)
   headers.append("Location", state)
 
   // const secure = " HttpOnly; Secure; SameSite=Strict;"

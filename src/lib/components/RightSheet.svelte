@@ -11,7 +11,6 @@
 
   async function login() {
     const redirectUri = window.location.origin + PUBLIC_WEB_GOOGLE_REDIRECT_PATH
-    console.log(redirectUri)
 
     const url = new URL("https://accounts.google.com/o/oauth2/v2/auth")
     url.searchParams.append("client_id", PUBLIC_WEB_GOOGLE_CLIENT_ID)
