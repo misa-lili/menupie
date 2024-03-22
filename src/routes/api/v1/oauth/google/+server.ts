@@ -6,11 +6,7 @@ import {
 
 export const GET = async ({ url }) => {
   const TOKEN_URI = "https://oauth2.googleapis.com/token"
-  const redirectUri =
-    (url.host.includes("ngrok") ? "https://" : url.protocol) +
-    url.host +
-    PUBLIC_WEB_GOOGLE_REDIRECT_PATH
-  console.log(redirectUri)
+  const redirectUri = url.origin + PUBLIC_WEB_GOOGLE_REDIRECT_PATH
 
   const params = new URLSearchParams()
   params.append("code", url.searchParams.get("code") as string)
@@ -28,6 +24,10 @@ export const GET = async ({ url }) => {
   })
 
   const body = await tokenResponse.json()
+  if (tokenResponse.status !== 200) {
+    console.log(redirectUri)
+    console.log(body)
+  }
 
   const token: string = body.id_token
 

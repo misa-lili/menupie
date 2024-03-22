@@ -131,24 +131,6 @@
       👋<button on:click={logout}>Logout</button>
     </div>
   </section>
-
-  {#if $isAdmin === true}
-    <h3>admin panel</h3>
-    <div>
-      <button
-        on:click={() => {
-          fetch("/api/v1/initTables")
-        }}>init tables</button
-      >
-    </div>
-    <div>
-      <button
-        on:click={() => {
-          fetch("/api/v1/insertSamples")
-        }}>insert samples</button
-      >
-    </div>
-  {/if}
 </sheet>
 
 <style>
