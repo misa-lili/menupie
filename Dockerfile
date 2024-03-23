@@ -1,7 +1,7 @@
-FROM oven/bun:1.0.35-alpine
+FROM node:20-alpine
 WORKDIR /app
 COPY . .
-RUN bun install
-RUN bun run build
-CMD ["bun", "build/index.js"]
+RUN npm install
+RUN npm run build
+CMD ["node", "build"]
 EXPOSE 3000
