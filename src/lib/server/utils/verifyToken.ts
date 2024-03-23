@@ -37,9 +37,6 @@ export default async function verifyToken(
           ...payload,
         }
       } catch (verificationError) {
-        console.log(
-          "Verification failed with the current key. Trying the next key.",
-        )
         // 현재 키로 검증 실패 시 다음 키로 시도
         continue
       }
