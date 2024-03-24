@@ -1,7 +1,10 @@
 <script lang="ts">
   import "../app.css"
   import RightSheet from "$lib/components/RightSheet.svelte"
+  import TopBar from "$lib/components/TopBar.svelte"
 </script>
+
+<TopBar></TopBar>
 
 <RightSheet></RightSheet>
 

@@ -1,28 +1,18 @@
 <script lang="ts">
   import { goto } from "$app/navigation"
-  import { onMount } from "svelte"
-  import {
-    PUBLIC_WEB_GOOGLE_CLIENT_ID,
-    PUBLIC_WEB_GOOGLE_REDIRECT_PATH,
-  } from "$env/static/public"
-  import { menus, tokenPayload, isAdmin } from "$lib/store"
+  import { onMount, onDestroy } from "svelte"
+  import { menus, tokenPayload, isAdmin, eventBus } from "$lib/store"
 
   let isOpen = false
 
-  async function login() {
-    const redirectUri = window.location.origin + PUBLIC_WEB_GOOGLE_REDIRECT_PATH
-
-    const url = new URL("https://accounts.google.com/o/oauth2/v2/auth")
-    url.searchParams.append("client_id", PUBLIC_WEB_GOOGLE_CLIENT_ID)
-    url.searchParams.append("redirect_uri", redirectUri)
-    url.searchParams.append("response_type", "code")
-    url.searchParams.append("scope", "email profile")
-    url.searchParams.append("access_type", "offline")
-    url.searchParams.append("prompt", "consent")
-    url.searchParams.append("state", window.location.href)
-
-    window.location = url.toString()
-  }
+  eventBus.subscribe(({ event, detail }) => {
+    if (event === "openRightSheet") {
+      open(detail.event)
+    }
+  })
+  onDestroy(() => {
+    eventBus.subscribe(() => {})
+  })
 
   async function logout() {
     document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
@@ -54,8 +44,8 @@
     window.location.reload()
   }
 
-  function open(event) {
-    event.stopPropagation()
+  function open(event?: Event) {
+    if (event) event.stopPropagation()
     isOpen = true
   }
 
@@ -82,27 +72,6 @@
     }
   }
 </script>
-
-{#if !$tokenPayload.email}
-  <icon
-    class:hidden={isOpen}
-    class="fixed top-0 right-0 cursor-pointer m-6"
-    on:click={login}
-  >
-    <img
-      class="grayscale opacity-50"
-      src="https://lh3.googleusercontent.com/COxitqgJr1sJnIDe8-jiKhxDx1FrYbtRHKJ9z_hELisAlapwE9LUPh6fcXIfb5vwpbMl4xl9H9TRFPc5NOO8Sb3VSgIBrfRYvW6cUA"
-    />
-  </icon>
-{:else}
-  <icon
-    class:hidden={isOpen}
-    class="fixed top-0 right-0 cursor-pointer m-6"
-    on:click={open}
-  >
-    <img src={$tokenPayload.picture} alt={$tokenPayload.name} />
-  </icon>
-{/if}
 
 <sheet
   class:right-0={isOpen}

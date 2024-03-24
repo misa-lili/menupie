@@ -2,7 +2,14 @@
   import Editor from "$lib/templates/Editor.svelte"
   import Skeleton from "$lib/templates/Skeleton.svelte"
   import Dosisool from "$lib/templates/Dosisool.svelte"
-  import { menu, menus, tokenPayload, isOwner, isAdmin } from "$lib/store"
+  import {
+    menu,
+    menus,
+    tokenPayload,
+    isOwner,
+    isAdmin,
+    eventBus,
+  } from "$lib/store"
 
   export let data: {
     menu: Menu
@@ -43,13 +50,4 @@
   }
 </script>
 
-<div class:hidden={!data.tokenPayload.email || !$isOwner}>
-  <select bind:value={currentTemplate}>
-    <option value="Skeleton">Skeleton</option>
-    <option value="Dosisool">Dosisool</option>
-    <option value="Editor">Editor</option>
-  </select>
-  <button on:click={saveTemplate}>💾</button>
-</div>
-
-<svelte:component this={template[currentTemplate]} />
+<Editor></Editor>

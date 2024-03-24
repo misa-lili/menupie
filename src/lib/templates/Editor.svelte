@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { onMount, tick } from "svelte"
-  import { menu as storeMenu, tokenPayload } from "$lib/store"
+  import { onDestroy, onMount, tick } from "svelte"
+  import { eventBus, menu as storeMenu, tokenPayload } from "$lib/store"
   import { get } from "svelte/store"
 
   let menu = JSON.parse(JSON.stringify(get(storeMenu)))
@@ -12,6 +12,18 @@
 
   onMount(() => {
     addSaveShortcut()
+  })
+
+  eventBus.subscribe(async ({ event, detail }) => {
+    if (event === "save") {
+      await save()
+    }
+    if (event === "rollback") {
+      menu = JSON.parse(JSON.stringify(get(storeMenu)))
+    }
+  })
+  onDestroy(() => {
+    eventBus.subscribe(() => {})
   })
 
   async function addSaveShortcut() {
@@ -58,6 +70,10 @@
 
   export async function save() {
     if (!$tokenPayload.email) {
+      return
+    }
+
+    if (confirm("저장하시겠습니까?") === false) {
       return
     }
 
@@ -191,13 +207,6 @@
   }
 </script>
 
-<div
-  class:hidden={!$tokenPayload.email}
-  class="fixed z-50 bottom-0 left-1/2 -translate-x-1/2 pb-3"
->
-  <button on:click={save}>저장</button>
-</div>
-
 <div id="toolbox" class="hidden">
   <button on:mousedown|preventDefault={() => move(-1)}>🔼</button>
   <button on:mousedown|preventDefault={() => move(1)}>🔽</button>
@@ -278,7 +287,7 @@
 
 <style>
   main {
-    @apply container mx-auto mt-16 mb-24 px-6 w-full sm:w-4/5 md:w-3/4 lg:w-2/3 xl:w-[40%];
+    @apply container mx-auto mt-6 mb-24 px-6 w-full sm:w-4/5 md:w-3/4 lg:w-2/3 xl:w-[40%];
   }
 
   section {
