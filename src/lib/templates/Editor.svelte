@@ -4,9 +4,10 @@
   import { get } from "svelte/store"
 
   let menu = JSON.parse(JSON.stringify(get(storeMenu)))
-  $: if ($storeMenu) {
-    menu = JSON.parse(JSON.stringify(get(storeMenu)))
-  }
+
+  storeMenu.subscribe((value) => {
+    menu = JSON.parse(JSON.stringify(value))
+  })
 
   let focused = {
     id: "",
