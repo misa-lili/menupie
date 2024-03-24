@@ -2,8 +2,6 @@ import { pool } from "$lib/server/db/connection"
 import verifyToken from "$lib/server/utils/verifyToken"
 import { redirect } from "@sveltejs/kit"
 import { ADMIN_EMAILS } from "$env/static/private"
-import { menu as storeMenu } from "$lib/store.js"
-import { get } from "svelte/store"
 
 export const load = async ({ cookies, params }) => {
   const tokenPayload: TokenPayload = await verifyToken(cookies.get("token"))
@@ -41,11 +39,13 @@ export const load = async ({ cookies, params }) => {
   const isOwner = tokenPayload.email === menu.email
   const isAdmin = ADMIN_EMAILS.split(",").includes(tokenPayload.email)
 
-  return {
+  const data = {
     menus,
     menu,
     tokenPayload,
     isOwner,
     isAdmin,
   }
+
+  return data
 }

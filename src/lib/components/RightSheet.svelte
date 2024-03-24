@@ -2,6 +2,9 @@
   import { goto } from "$app/navigation"
   import { onMount, onDestroy } from "svelte"
   import { menus, tokenPayload, isAdmin, eventBus } from "$lib/store"
+  import { redirect } from "@sveltejs/kit"
+  import { page } from "$app/stores"
+  import { get } from "svelte/store"
 
   let isOpen = false
 
@@ -29,19 +32,31 @@
       },
       body: JSON.stringify({ key: newKey }),
     })
-    alert(await response.text())
+
+    if (response.ok) {
+      await goto(newKey)
+    }
   }
 
   async function deleteMenu(id) {
+    if (!confirm("정말 삭제하시겠습니까?")) return
+
     const response = await fetch(`/api/v1/menus/${id}`, {
       method: "DELETE",
     })
-    console.log(await response.text())
+
+    if (response.ok) {
+      const currentKey = get(page).params.key
+      const targetKey = $menus.find((v) => v.id === id).key
+      $menus = $menus.filter((menu) => menu.id !== id)
+      if (currentKey === targetKey) {
+        await goto("/main")
+      }
+    }
   }
 
   async function gotoMenu(key) {
     await goto(key)
-    window.location.reload()
   }
 
   function open(event?: Event) {
@@ -81,9 +96,9 @@
   {#if $menus?.length > 0}
     <section id="menu-list">
       <h2>your menu list</h2>
-      {#each $menus as menuHandle}
+      {#each $menus as menuHandle (menuHandle.id)}
         <div>
-          <button on:click={gotoMenu(menuHandle.key)}>{menuHandle.key}</button>
+          <a on:click={gotoMenu(menuHandle.key)}>{menuHandle.key}</a>
           <button on:click={deleteMenu(menuHandle.id)}>ˣ</button>
         </div>
       {/each}

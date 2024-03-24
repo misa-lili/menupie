@@ -1,6 +1,6 @@
 import { pool } from "$lib/server/db/connection"
 import verifyToken from "$lib/server/utils/verifyToken"
-import { error } from "@sveltejs/kit"
+import { error, redirect } from "@sveltejs/kit"
 
 export const POST = async ({ cookies, request }) => {
   const token = cookies.get("token")
@@ -12,10 +12,12 @@ export const POST = async ({ cookies, request }) => {
   const { key } = await request.json()
 
   const client = await pool.connect()
-  await client.query(
+  const result = await client.query(
     /* sql */ `
       INSERT INTO menus (key, email, data)
-      VALUES ($1, $2, $3);`,
+      VALUES ($1, $2, $3)
+      RETURNING id, key;
+    `,
     [
       String(key).toLowerCase(),
       email,
@@ -32,10 +34,12 @@ export const POST = async ({ cookies, request }) => {
   )
   client.release()
 
-  const headers = new Headers()
-  headers.append("Location", `/${key}`)
-  return new Response(undefined, {
-    status: 302,
-    headers: headers,
-  })
+  // const headers = new Headers()
+  // headers.append("Location", `/${key}`)
+  // return new Response(undefined, {
+  //   status: 302,
+  //   headers: headers,
+  // })
+  // return redirect(302, `/${key}`)
+  return new Response(JSON.stringify(result.rows[0]))
 }

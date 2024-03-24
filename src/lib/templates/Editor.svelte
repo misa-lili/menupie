@@ -4,6 +4,10 @@
   import { get } from "svelte/store"
 
   let menu = JSON.parse(JSON.stringify(get(storeMenu)))
+  $: if ($storeMenu) {
+    menu = JSON.parse(JSON.stringify(get(storeMenu)))
+  }
+
   let focused = {
     id: "",
     arr: [],
