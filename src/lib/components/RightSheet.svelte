@@ -18,6 +18,8 @@
   })
 
   async function logout() {
+    if (!confirm("정말 로그아웃하시겠습니까?")) return
+
     document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
     await goto("/", { replaceState: true })
     window.location.reload()
@@ -25,6 +27,8 @@
 
   async function createMenu() {
     const newKey = prompt("Enter new menu key")
+    if (!newKey) return
+
     const response = await fetch("/api/v1/menus", {
       method: "POST",
       headers: {
@@ -94,25 +98,29 @@
   use:clickOutside={close}
 >
   {#if $menus?.length > 0}
-    <section id="menu-list">
-      <h2>your menu list</h2>
-      {#each $menus as menuHandle (menuHandle.id)}
-        <div>
-          <a on:click={gotoMenu(menuHandle.key)}>{menuHandle.key}</a>
-          <button on:click={deleteMenu(menuHandle.id)}>ˣ</button>
-        </div>
-      {/each}
-    </section>
+    <div>
+      <h2 class="pl-1.5 pb-0.5 text-slate-600">메뉴들</h2>
+      <ul>
+        {#each $menus as menuHandle (menuHandle.id)}
+          <li class="cursor-pointer" on:click={gotoMenu(menuHandle.key)}>
+            <span>{menuHandle.key}</span>
+            <button
+              class="cursor-pointer"
+              on:click|stopPropagation={deleteMenu(menuHandle.id)}>🗑️</button
+            >
+          </li>
+        {/each}
+      </ul>
+    </div>
   {/if}
+  <button class="button-text" on:click={createMenu}>➕</button>
 
-  <section id="create-menu">
-    <button on:click={createMenu}>create menu</button>
-  </section>
+  <section id="create-menu"></section>
 
   <section id="logout">
-    <div>
-      👋<button on:click={logout}>Logout</button>
-    </div>
+    <button class="button-text" on:click={logout}>
+      <span>👋</span>
+    </button>
   </section>
 </sheet>
 
@@ -124,5 +132,36 @@
 
   section {
     @apply mb-12;
+  }
+
+  ul {
+    @apply mb-2 bg-slate-200 rounded-lg shadow-sm;
+  }
+
+  ul li {
+    @apply py-3 px-6 flex justify-between items-center;
+    @apply text-lg font-mono;
+  }
+
+  ul li:first-child {
+    @apply hover:bg-slate-100/50 rounded-t-lg;
+  }
+
+  ul li:not(:first-child):not(:last-child) {
+    @apply hover:bg-slate-100/50;
+  }
+
+  ul li:last-child {
+    @apply hover:bg-slate-100/50 rounded-b-lg;
+  }
+
+  ul li:not(:last-child) {
+    @apply border-b border-slate-300;
+  }
+
+  .button-text {
+    @apply w-full py-3 px-6 rounded-lg bg-slate-200 text-slate-800 shadow-sm;
+    @apply hover:bg-slate-200;
+    @apply text-lg tracking-wider font-mono;
   }
 </style>
