@@ -7,9 +7,10 @@ current_dir=$(basename "$PWD")
 echo "Building $current_dir image..."
 docker build -t "$current_dir" .
 
-# 기존에 실행 중인 컨테이너 중지
+# 기존에 실행 중인 컨테이너 중지 및 제거
 echo "Stopping and removing existing $current_dir container..."
 docker stop "$current_dir" >/dev/null 2>&1
+docker rm "$current_dir" >/dev/null 2>&1
 
 # 도커 컨테이너 실행
 echo "Running $current_dir container..."
