@@ -126,8 +126,8 @@
 
 <style>
   sheet {
-    @apply fixed top-0 w-[300px] h-full shadow-lg m-0 py-4 px-8;
-    @apply transition-all text-black h-full rounded-l-3xl bg-slate-100;
+    @apply fixed top-0 w-[300px] h-full shadow-2xl m-0 py-12 px-8;
+    @apply transition-all text-black h-full rounded-tl-3xl bg-slate-100;
   }
 
   section {
