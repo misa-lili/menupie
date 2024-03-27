@@ -87,6 +87,7 @@
         !confirm("변경사항을 되돌리시겠습니까?")
       )
         return
+
       $store_isEditable = !$store_isEditable
       menu = JSON.parse(JSON.stringify(get(store_menu)))
     }
@@ -233,7 +234,7 @@
   <section>
     <h1
       id={menu.data.title.id}
-      contenteditable="false"
+      contenteditable="true"
       bind:innerText={menu.data.title.value}
     />
   </section>
@@ -243,7 +244,7 @@
       <div
         id={header.id}
         class:out-of-stock={header.out}
-        contenteditable="false"
+        contenteditable="true"
         on:focus={() => focus(menu.data.headers, idx, header.id)}
         on:blur={blur}
         bind:innerText={header.value}
@@ -260,28 +261,28 @@
         <div class="between">
           <h2
             class:out-of-stock={group.out}
-            contenteditable="false"
+            contenteditable="true"
             bind:innerHTML={group.name}
             id={group.id}
             on:focus={() => focus(menu.data.groups, idx, group.id)}
             on:blur={blur}
           />
-          <span contenteditable="false" bind:innerHTML={group.col} />
+          <span contenteditable="true" bind:innerHTML={group.col} />
         </div>
         {#each group.items || [] as item, idx (item.id)}
           <div class="item">
             <div class="between">
               <h3
                 class:out-of-stock={item.out}
-                contenteditable="false"
+                contenteditable="true"
                 bind:innerHTML={item.name}
                 id={item.id}
                 on:focus={() => focus(group.items, idx, item.id)}
                 on:blur={blur}
               />
-              <div contenteditable="false" bind:innerHTML={item.price} />
+              <div contenteditable="true" bind:innerHTML={item.price} />
             </div>
-            <div contenteditable="false" bind:innerHTML={item.description} />
+            <div contenteditable="true" bind:innerHTML={item.description} />
           </div>
         {/each}
         <button
@@ -301,7 +302,7 @@
     {#each menu.data.footers || [] as footer, idx (footer.id)}
       <div
         class:out-of-stock={footer.out}
-        contenteditable="false"
+        contenteditable="true"
         bind:innerHTML={footer.value}
         id={footer.id}
         on:focus={() => focus(menu.data.footers, idx, footer.id)}
