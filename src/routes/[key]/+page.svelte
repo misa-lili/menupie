@@ -68,7 +68,9 @@
   }
 
   function setUneditable() {
-    if ($page.params.key === PUBLIC_MAIN_KEY) return
+    if ($page.params.key === PUBLIC_MAIN_KEY) {
+      return setEditable()
+    }
     console.log("set uneditable")
     document.querySelectorAll("[contenteditable]").forEach((element) => {
       element.setAttribute("contenteditable", "false")
@@ -82,7 +84,7 @@
     if (event === "rollback") {
       if (
         JSON.stringify(menu) !== JSON.stringify($store_menu) &&
-        !confirm("변경사항이 있습니다. 되돌리시겠습니까?")
+        !confirm("변경사항을 되돌리시겠습니까?")
       )
         return
       $store_isEditable = !$store_isEditable
