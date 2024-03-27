@@ -1,20 +1,25 @@
 <script lang="ts">
   import { goto } from "$app/navigation"
   import { onMount, onDestroy } from "svelte"
-  import { menus, tokenPayload, isAdmin, eventBus } from "$lib/store"
+  import {
+    store_menus,
+    store_tokenPayload,
+    store_isAdmin,
+    store_eventBus,
+  } from "$lib/store"
   import { redirect } from "@sveltejs/kit"
   import { page } from "$app/stores"
   import { get } from "svelte/store"
 
   let isOpen = false
 
-  eventBus.subscribe(({ event, detail }) => {
+  store_eventBus.subscribe(({ event, detail }) => {
     if (event === "openRightSheet") {
       open(detail.event)
     }
   })
   onDestroy(() => {
-    eventBus.subscribe(() => {})
+    store_eventBus.subscribe(() => {})
   })
 
   async function logout() {
@@ -51,8 +56,8 @@
 
     if (response.ok) {
       const currentKey = get(page).params.key
-      const targetKey = $menus.find((v) => v.id === id).key
-      $menus = $menus.filter((menu) => menu.id !== id)
+      const targetKey = $store_menus.find((v) => v.id === id).key
+      $store_menus = $store_menus.filter((menu) => menu.id !== id)
       if (currentKey === targetKey) {
         await goto("/main")
       }
@@ -97,11 +102,11 @@
   class:-right-[300px]={!isOpen}
   use:clickOutside={close}
 >
-  {#if $menus?.length > 0}
+  {#if $store_menus?.length > 0}
     <div>
       <h2 class="pl-1.5 pb-0.5 text-slate-600">메뉴들</h2>
       <ul>
-        {#each $menus as menuHandle (menuHandle.id)}
+        {#each $store_menus as menuHandle (menuHandle.id)}
           <li class="cursor-pointer" on:click={gotoMenu(menuHandle.key)}>
             <span>{menuHandle.key}</span>
             <button

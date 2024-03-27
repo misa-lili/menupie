@@ -1,17 +1,17 @@
 <script lang="ts">
   import { onMount } from "svelte"
-  import { menu } from "$lib/store"
+  import { store_menu } from "$lib/store"
 </script>
 
 <main>
   <section id="title">
     <h1>
-      {@html $menu.data.title?.value || "새로운 타이틀"}
+      {@html $store_menu.data.title?.value || "새로운 타이틀"}
     </h1>
   </section>
 
   <section id="headers">
-    {#each $menu.data.headers || [] as header}
+    {#each $store_menu.data.headers || [] as header}
       <div>
         {@html header.value}
       </div>
@@ -19,7 +19,7 @@
   </section>
 
   <section id="groups">
-    {#each $menu.data.groups || [] as group}
+    {#each $store_menu.data.groups || [] as group}
       <div class="group">
         <h2>
           {group.name || ""}

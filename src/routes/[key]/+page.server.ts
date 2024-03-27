@@ -2,6 +2,7 @@ import { pool } from "$lib/server/db/connection"
 import verifyToken from "$lib/server/utils/verifyToken"
 import { redirect } from "@sveltejs/kit"
 import { ADMIN_EMAILS } from "$env/static/private"
+import bridgeVersions from "$lib/server/utils/bridgeVersions.js"
 
 export const load = async ({ cookies, params }) => {
   const tokenPayload: TokenPayload = await verifyToken(cookies.get("token"))
@@ -19,7 +20,7 @@ export const load = async ({ cookies, params }) => {
     )
     .then((result) => result.rows)
 
-  const menu = await client
+  const menu: Menu = await client
     .query(
       /*sql*/ `
         SELECT * 
@@ -38,6 +39,8 @@ export const load = async ({ cookies, params }) => {
 
   const isOwner = tokenPayload.email === menu.email
   const isAdmin = ADMIN_EMAILS.split(",").includes(tokenPayload.email)
+
+  menu.data = bridgeVersions(menu.data)
 
   const data = {
     menus,

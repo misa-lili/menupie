@@ -1,7 +1,7 @@
-import { writable, get } from "svelte/store"
+import { writable } from "svelte/store"
 
-export const menus = writable<MenuHandle[]>([])
-export const menu = writable<Menu>({
+export const store_menus = writable<MenuHandle[]>([])
+export const store_menu = writable<Menu>({
   id: 0,
   key: "",
   email: "",
@@ -15,11 +15,11 @@ export const menu = writable<Menu>({
     styles: [],
   },
 })
-export const tokenPayload = writable<Partial<GoogleTokenPayload>>({})
-export const isOwner = writable<boolean>(false)
-export const isAdmin = writable<boolean>(false)
-export const isOpen = writable<boolean>(false)
-export const isEditable = writable<boolean>(false)
+export const store_tokenPayload = writable<Partial<GoogleTokenPayload>>({})
+export const store_isOwner = writable<boolean>(false)
+export const store_isAdmin = writable<boolean>(false)
+export const store_isOpen = writable<boolean>(false)
+export const store_isEditable = writable<boolean>(false)
 
 function createEventBus() {
   const { subscribe, set } = writable({})
@@ -32,4 +32,4 @@ function createEventBus() {
   }
 }
 
-export const eventBus = createEventBus()
+export const store_eventBus = createEventBus()

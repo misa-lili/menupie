@@ -1,28 +1,30 @@
 <script lang="ts">
   import {
-    tokenPayload,
-    isOwner,
-    isOpen,
-    isEditable,
-    eventBus,
+    store_tokenPayload,
+    store_isOwner,
+    store_isOpen,
+    store_isEditable,
+    store_eventBus,
   } from "$lib/store"
   import {
     PUBLIC_WEB_GOOGLE_CLIENT_ID,
     PUBLIC_WEB_GOOGLE_REDIRECT_PATH,
   } from "$env/static/public"
+  import { goto } from "$app/navigation"
 
   function triggerSave() {
-    eventBus.trigger("save", {})
+    store_eventBus.trigger("save", {})
   }
 
   function triggerOpenRightSheet(event) {
-    eventBus.trigger("openRightSheet", { event })
+    store_eventBus.trigger("openRightSheet", { event })
   }
 
   function toggleEditable() {
-    $isEditable = !$isEditable
-    if ($isEditable === false) {
-      eventBus.trigger("rollback", {})
+    if ($store_isEditable === false) {
+      $store_isEditable = !$store_isEditable
+    } else if ($store_isEditable === true) {
+      store_eventBus.trigger("rollback", {})
     }
   }
 
@@ -44,18 +46,18 @@
 
 <div id="top-bar">
   <div class="flex gap-5">
-    {#if $isOwner}
+    {#if $store_isOwner}
       <button
-        class:hidden={!$tokenPayload.email || !$isOwner}
+        class:hidden={!$store_tokenPayload.email || !$store_isOwner}
         class="icon text-4xl"
         on:click={toggleEditable}
       >
-        {$isEditable ? "⏎" : "🏗️"}
+        {$store_isEditable ? "⏎" : "🏗️"}
       </button>
     {/if}
-    {#if $isEditable}
+    {#if $store_isEditable}
       <button
-        class:hidden={!$tokenPayload.email || !$isOwner}
+        class:hidden={!$store_tokenPayload.email || !$store_isOwner}
         class="icon text-4xl"
         on:click={triggerSave}
       >
@@ -65,8 +67,12 @@
   </div>
 
   <div class="flex gap-5">
-    {#if !$tokenPayload.email}
-      <button class:hidden={$isOpen} on:click={login} class="icon text-4xl">
+    {#if !$store_tokenPayload.email}
+      <button
+        class:hidden={$store_isOpen}
+        on:click={login}
+        class="icon text-4xl"
+      >
         <img
           class="grayscale opacity-50"
           src="https://lh3.googleusercontent.com/COxitqgJr1sJnIDe8-jiKhxDx1FrYbtRHKJ9z_hELisAlapwE9LUPh6fcXIfb5vwpbMl4xl9H9TRFPc5NOO8Sb3VSgIBrfRYvW6cUA"
@@ -74,11 +80,11 @@
       </button>
     {:else}
       <button
-        class:hidden={$isOpen}
+        class:hidden={$store_isOpen}
         on:click={triggerOpenRightSheet}
         class="icon"
       >
-        <img src={$tokenPayload.picture} alt={$tokenPayload.name} />
+        <img src={$store_tokenPayload.picture} alt={$store_tokenPayload.name} />
       </button>
     {/if}
   </div>
