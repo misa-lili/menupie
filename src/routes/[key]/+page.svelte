@@ -30,6 +30,9 @@
     $store_isAdmin = data.isAdmin
   }
 
+  $: isEditable =
+    $page.params.key === PUBLIC_MAIN_KEY ? true : $store_isEditable
+
   let menu = JSON.parse(JSON.stringify(get(store_menu)))
   store_menu.subscribe((value) => {
     menu = JSON.parse(JSON.stringify(value))
@@ -250,7 +253,7 @@
         bind:innerText={header.value}
       />
     {/each}
-    <button class:hidden={!$store_isEditable} on:click={insertHeader}>
+    <button class:hidden={!isEditable} on:click={insertHeader}>
       헤더추가
     </button>
   </section>
@@ -285,15 +288,12 @@
             <div contenteditable="true" bind:innerHTML={item.description} />
           </div>
         {/each}
-        <button
-          class:hidden={!$store_isEditable}
-          on:click={() => insertItem(group)}
-        >
+        <button class:hidden={!isEditable} on:click={() => insertItem(group)}>
           아이템추가
         </button>
       </div>
     {/each}
-    <button class:hidden={!$store_isEditable} on:click={insertGroup}>
+    <button class:hidden={!isEditable} on:click={insertGroup}>
       그룹추가
     </button>
   </section>
@@ -309,9 +309,15 @@
         on:blur={blur}
       />
     {/each}
-    <button class:hidden={!$store_isEditable} on:click={insertFooter}>
+    <button class:hidden={!isEditable} on:click={insertFooter}>
       푸터추가
     </button>
+  </section>
+
+  <section>
+    <div class="text-right font-extralight text-sm">
+      Created via <a href={PUBLIC_MAIN_KEY}>Menupi</a> 2024
+    </div>
   </section>
 </main>
 

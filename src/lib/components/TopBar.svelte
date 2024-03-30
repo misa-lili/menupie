@@ -7,10 +7,12 @@
     store_eventBus,
   } from "$lib/store"
   import {
+    PUBLIC_MAIN_KEY,
     PUBLIC_WEB_GOOGLE_CLIENT_ID,
     PUBLIC_WEB_GOOGLE_REDIRECT_PATH,
   } from "$env/static/public"
   import { goto } from "$app/navigation"
+  import { page } from "$app/stores"
 
   function triggerSave() {
     store_eventBus.trigger("save", {})
@@ -67,7 +69,7 @@
   </div>
 
   <div class="flex gap-5">
-    {#if !$store_tokenPayload.email}
+    {#if !$store_tokenPayload.email && $page.params.key === PUBLIC_MAIN_KEY}
       <button
         class:hidden={$store_isOpen}
         on:click={login}
