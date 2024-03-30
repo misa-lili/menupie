@@ -80,7 +80,7 @@
           src="https://lh3.googleusercontent.com/COxitqgJr1sJnIDe8-jiKhxDx1FrYbtRHKJ9z_hELisAlapwE9LUPh6fcXIfb5vwpbMl4xl9H9TRFPc5NOO8Sb3VSgIBrfRYvW6cUA"
         />
       </button>
-    {:else}
+    {:else if $store_tokenPayload.email}
       <button
         class:hidden={$store_isOpen}
         on:click={triggerOpenRightSheet}
