@@ -11,7 +11,7 @@
   } from "$lib/store"
   import { get } from "svelte/store"
   import { page } from "$app/stores"
-  import { PUBLIC_MAIN_KEY } from "$env/static/public"
+  import { PUBLIC_MAIN_KEY, PUBLIC_STORAGE_HOST } from "$env/static/public"
   import { goto } from "$app/navigation"
 
   export let data: {
@@ -29,10 +29,6 @@
     $store_tokenPayload = data.tokenPayload
     $store_isOwner = data.isOwner
     $store_isAdmin = data.isAdmin
-  }
-
-  $: if (isMounted && data.menu.data.template) {
-    setStyle()
   }
 
   $: isEditable =
@@ -68,30 +64,6 @@
     }
   })
 
-  let styleElement: HTMLStyleElement
-  function setStyle() {
-    console.log("setStyle")
-    removeStyle()
-    const url = `https://menupi.s3.ap-northeast-2.amazonaws.com/${menu.data.template}.css`
-    fetch(url)
-      .then((response) => response.text())
-      .then((style) => {
-        styleElement = document.createElement("style")
-        styleElement.textContent = style
-        document.head.appendChild(styleElement)
-      })
-  }
-
-  function removeStyle() {
-    if (styleElement) {
-      document.head.removeChild(styleElement)
-    }
-  }
-
-  onDestroy(() => {
-    removeStyle()
-  })
-
   function setEditable() {
     document.querySelectorAll("[contenteditable]").forEach((element) => {
       element.setAttribute("contenteditable", "true")
@@ -123,7 +95,6 @@
     }
     if (event === "changeTemplate") {
       menu.data.template = detail.template
-      setStyle()
     }
   })
 
@@ -256,6 +227,13 @@
     menu = menu
   }
 </script>
+
+<svelte:head>
+  <link
+    rel="stylesheet"
+    href={`${PUBLIC_STORAGE_HOST}/${menu.data.template}.css`}
+  />
+</svelte:head>
 
 <div id="toolbox" class="hidden">
   <button on:mousedown|preventDefault={() => move(-1)}>🔼</button>
