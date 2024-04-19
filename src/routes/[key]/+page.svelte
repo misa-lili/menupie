@@ -61,10 +61,34 @@
     } else {
       setUneditable()
     }
+
+    setStyle()
+  })
+
+  let styleElement: HTMLStyleElement
+  function setStyle() {
+    removeStyle()
+    const url = `https://menupi.s3.ap-northeast-2.amazonaws.com/${menu.data.template}.css`
+    fetch(url)
+      .then((response) => response.text())
+      .then((style) => {
+        styleElement = document.createElement("style")
+        styleElement.textContent = style
+        document.head.appendChild(styleElement)
+      })
+  }
+
+  function removeStyle() {
+    if (styleElement) {
+      document.head.removeChild(styleElement)
+    }
+  }
+
+  onDestroy(() => {
+    removeStyle()
   })
 
   function setEditable() {
-    console.log("set editable")
     document.querySelectorAll("[contenteditable]").forEach((element) => {
       element.setAttribute("contenteditable", "true")
     })
@@ -74,7 +98,6 @@
     if ($page.params.key === PUBLIC_MAIN_KEY) {
       return setEditable()
     }
-    console.log("set uneditable")
     document.querySelectorAll("[contenteditable]").forEach((element) => {
       element.setAttribute("contenteditable", "false")
     })
@@ -93,6 +116,10 @@
 
       $store_isEditable = !$store_isEditable
       menu = JSON.parse(JSON.stringify(get(store_menu)))
+    }
+    if (event === "changeTemplate") {
+      menu.data.template = detail.template
+      setStyle()
     }
   })
 

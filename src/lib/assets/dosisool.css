@@ -1,0 +1,6 @@
+html, body {
+  color: rgba(205, 156, 112, 0.8);
+  /* background: linear-gradient(to bottom, #2f372e, #252d24, #1c2219, #2f372e); */
+  background-color: #2f372e;
+  -webkit-overflow-scrolling: touch;
+}

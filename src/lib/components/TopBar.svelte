@@ -5,6 +5,7 @@
     store_isOpen,
     store_isEditable,
     store_eventBus,
+    store_menu,
   } from "$lib/store"
   import {
     PUBLIC_MAIN_KEY,
@@ -20,6 +21,10 @@
 
   function triggerOpenRightSheet(event) {
     store_eventBus.trigger("openRightSheet", { event })
+  }
+
+  function triggerChangeTemplate(event) {
+    store_eventBus.trigger("changeTemplate", { template: event.target.value })
   }
 
   function toggleEditable() {
@@ -58,6 +63,14 @@
       </button>
     {/if}
     {#if $store_isEditable}
+      <select
+        bind:value={$store_menu.data.template}
+        on:change={(event) => triggerChangeTemplate(event)}
+      >
+        <option value="default">기본</option>
+        <option value="dosisool">도시술</option>
+      </select>
+
       <button
         class:hidden={!$store_tokenPayload.email || !$store_isOwner}
         class="icon text-4xl"
