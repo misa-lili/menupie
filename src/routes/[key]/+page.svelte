@@ -23,11 +23,16 @@
   }
 
   $: if (data) {
+    console.log("data -> store")
     $store_menu = data.menu
     $store_menus = data.menus
     $store_tokenPayload = data.tokenPayload
     $store_isOwner = data.isOwner
     $store_isAdmin = data.isAdmin
+  }
+
+  $: if (isMounted && data.menu.data.template) {
+    setStyle()
   }
 
   $: isEditable =
@@ -61,12 +66,11 @@
     } else {
       setUneditable()
     }
-
-    setStyle()
   })
 
   let styleElement: HTMLStyleElement
   function setStyle() {
+    console.log("setStyle")
     removeStyle()
     const url = `https://menupi.s3.ap-northeast-2.amazonaws.com/${menu.data.template}.css`
     fetch(url)
