@@ -232,7 +232,7 @@
   <link
     rel="stylesheet"
     type="text/css"
-    href={`${PUBLIC_STORAGE_HOST}/${menu.data.template}.css`}
+    href={`${PUBLIC_STORAGE_HOST}/${menu.data.template || "default"}.css`}
   />
 </svelte:head>
 
