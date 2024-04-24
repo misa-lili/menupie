@@ -27,6 +27,9 @@
   },
   "type": "module",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.556.0",
+    "@aws-sdk/credential-provider-ini": "^3.556.0",
+    "@aws-sdk/lib-storage": "^3.556.0",
     "fuse.js": "^7.0.0",
     "hangul-js": "^0.2.6",
     "jose": "^5.2.3",

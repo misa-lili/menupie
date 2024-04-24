@@ -43,6 +43,7 @@
     id: "",
     arr: [],
     idx: 0,
+    type: "",
   }
 
   $: if (isMounted && $store_isEditable && $page.params.key) {
@@ -104,9 +105,13 @@
 
   async function addSaveShortcut() {
     window.addEventListener("keydown", async (e) => {
-      if (e.key === "s" && (e.metaKey || e.ctrlKey)) {
+      if (e.key === "s" && (e.metaKey || e.ctrlKey) && isEditable) {
         e.preventDefault()
         await save()
+      }
+      if (e.key === "Escape") {
+        e.preventDefault()
+        blur()
       }
     })
   }
@@ -168,10 +173,21 @@
     menu.data.footers.push({ id: crypto.randomUUID(), value: "새로운 푸터" })
   }
 
-  function focus(arr: any[] | undefined, idx: number | undefined, id: string) {
+  function focus({
+    arr,
+    idx,
+    id,
+    type,
+  }: {
+    arr: any[] | undefined
+    idx: number | undefined
+    id: string
+    type: string
+  }) {
     focused.arr = arr
     focused.idx = idx
     focused.id = id
+    focused.type = type
 
     setToolbox(id)
   }
@@ -226,21 +242,65 @@
     focused.arr.splice(focused.idx, 1)
     menu = menu
   }
+
+  async function handleUpload() {
+    const input = document.getElementById("file")
+    // input 요소 클릭 이벤트 트리거
+    input.click()
+  }
+
+  async function onChangedFileInput(e) {
+    const file = e.target.files[0]
+    if (file) {
+      const formData = new FormData()
+      formData.append("file", file)
+
+      try {
+        const response = await fetch("/api/v1/storage", {
+          method: "POST",
+          body: formData,
+        })
+        const result = await response.json()
+
+        const target = document.getElementById(focused.id)
+        target.innerHTML = `<img src="${result.result.Location}" />`
+      } catch (error) {
+        console.error("Upload failed", error)
+      }
+    }
+  }
+
+  function delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms))
+  }
 </script>
 
 <svelte:head>
   <link
     rel="stylesheet"
     type="text/css"
-    href={`${PUBLIC_STORAGE_HOST}/${menu.data.template || "default"}.css`}
+    href={`${PUBLIC_STORAGE_HOST}/templates/${menu.data.template || "default"}.css`}
   />
 </svelte:head>
 
+<input
+  type="file"
+  id="file"
+  class="hidden"
+  accept="image/png, image/jpeg, image/svg+xml"
+  on:change={onChangedFileInput}
+/>
+
 <div id="toolbox" class="hidden">
-  <button on:mousedown|preventDefault={() => move(-1)}>🔼</button>
-  <button on:mousedown|preventDefault={() => move(1)}>🔽</button>
-  <button on:mousedown|preventDefault={toggleOut}>⛔️</button>
-  <button on:mousedown|preventDefault={deleteFocused}>🗑️</button>
+  {#if focused.type === "title"}
+    <button on:mousedown|preventDefault={handleUpload}>🖼️</button>
+  {:else}
+    <button on:mousedown|preventDefault={() => move(-1)}>🔼</button>
+    <button on:mousedown|preventDefault={() => move(1)}>🔽</button>
+    <button on:mousedown|preventDefault={() => {}}>🖼️</button>
+    <button on:mousedown|preventDefault={toggleOut}>⛔️</button>
+    <button on:mousedown|preventDefault={deleteFocused}>🗑️</button>
+  {/if}
 </div>
 
 <main>
@@ -248,6 +308,8 @@
     <h1
       id={menu.data.title.id}
       contenteditable="true"
+      on:focus={() => focus({ type: "title", id: menu.data.title.id })}
+      on:blur={blur}
       bind:innerText={menu.data.title.value}
     />
   </section>
@@ -258,7 +320,8 @@
         id={header.id}
         class:out-of-stock={header.out}
         contenteditable="true"
-        on:focus={() => focus(menu.data.headers, idx, header.id)}
+        on:focus={() =>
+          focus({ type: "header", arr: menu.data.headers, idx, id: header.id })}
         on:blur={blur}
         bind:innerText={header.value}
       />
@@ -277,7 +340,13 @@
             contenteditable="true"
             bind:innerHTML={group.name}
             id={group.id}
-            on:focus={() => focus(menu.data.groups, idx, group.id)}
+            on:focus={() =>
+              focus({
+                type: "group",
+                arr: menu.data.groups,
+                idx,
+                id: group.id,
+              })}
             on:blur={blur}
           />
           <span contenteditable="true" bind:innerHTML={group.col} />
@@ -290,7 +359,13 @@
                 contenteditable="true"
                 bind:innerHTML={item.name}
                 id={item.id}
-                on:focus={() => focus(group.items, idx, item.id)}
+                on:focus={() =>
+                  focus({
+                    type: "item",
+                    arr: group.items,
+                    idx,
+                    id: item.id,
+                  })}
                 on:blur={blur}
               />
               <div contenteditable="true" bind:innerHTML={item.price} />
@@ -315,7 +390,13 @@
         contenteditable="true"
         bind:innerHTML={footer.value}
         id={footer.id}
-        on:focus={() => focus(menu.data.footers, idx, footer.id)}
+        on:focus={() =>
+          focus({
+            type: "footer",
+            arr: menu.data.footers,
+            idx,
+            id: footer.id,
+          })}
         on:blur={blur}
       />
     {/each}
