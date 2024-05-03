@@ -6,6 +6,7 @@ export const store_menu = writable<Menu>({
   key: "",
   email: "",
   data: {
+    version: 2,
     title: { value: "" },
     headers: [],
     groups: [],

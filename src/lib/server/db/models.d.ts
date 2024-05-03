@@ -6,6 +6,7 @@ type Menu = {
 }
 
 type MenuData = {
+  version: 2
   title: Title
   headers: Header[]
   groups: Group[]
@@ -15,21 +16,21 @@ type MenuData = {
   styles: string[]
 }
 
-type Title = { id?: string; value: string; isRendered?: boolean }
-type Header = { id?: string; value: string; isRendered?: boolean }
+type Title = { id?: string; value: string; src?: string }
+type Header = { id?: string; value: string; src?: string }
 type Group = {
   id?: string
-  isRendered?: boolean
   name: string
   col?: string
   items: Item[]
+  src?: string
 }
 type Item = {
   id?: string
-  isRendered?: boolean
   name: string
   price: string
   description?: string
   out?: boolean
+  src?: string
 }
-type Footer = { id?: string; value: string; isRendered?: boolean }
+type Footer = { id?: string; value: string; src?: string }

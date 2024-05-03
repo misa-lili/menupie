@@ -64,7 +64,7 @@
     {/if}
     {#if $store_isEditable}
       <select
-        bind:value={$store_menu.data.template}
+        value={$store_menu.data.template}
         on:change={(event) => triggerChangeTemplate(event)}
       >
         <option value="default">기본</option>

@@ -14,6 +14,7 @@
   import { PUBLIC_MAIN_KEY, PUBLIC_STORAGE_HOST } from "$env/static/public"
   import { goto } from "$app/navigation"
 
+  // server to client
   export let data: {
     menu: Menu
     menus: MenuHandle[]
@@ -22,8 +23,9 @@
     isAdmin: boolean
   }
 
+  // data to store
   $: if (data) {
-    console.log("data -> store")
+    console.log(data.menu.data)
     $store_menu = data.menu
     $store_menus = data.menus
     $store_tokenPayload = data.tokenPayload
@@ -31,10 +33,11 @@
     $store_isAdmin = data.isAdmin
   }
 
+  // 편집 가능한 상태인지
   $: isEditable =
     $page.params.key === PUBLIC_MAIN_KEY ? true : $store_isEditable
 
-  let menu = JSON.parse(JSON.stringify(get(store_menu)))
+  let menu: Menu = JSON.parse(JSON.stringify(get(store_menu)))
   store_menu.subscribe((value) => {
     menu = JSON.parse(JSON.stringify(value))
   })
@@ -50,6 +53,11 @@
     setEditable()
   } else if (isMounted && !$store_isEditable && $page.params.key) {
     setUneditable()
+  }
+
+  $: if ($page.params.key && isMounted) {
+    console.log("trigger when key changed and mounted")
+    renderImageIterator()
   }
 
   let isMounted = false
@@ -82,9 +90,11 @@
 
   store_eventBus.subscribe(async ({ event, detail }) => {
     if (event === "save") {
+      console.log("got save event")
       await save()
     }
     if (event === "rollback") {
+      console.log("got rollback event")
       if (
         JSON.stringify(menu) !== JSON.stringify($store_menu) &&
         !confirm("변경사항을 되돌리시겠습니까?")
@@ -95,7 +105,9 @@
       menu = JSON.parse(JSON.stringify(get(store_menu)))
     }
     if (event === "changeTemplate") {
+      console.log("got changeTemplate event")
       menu.data.template = detail.template
+      await renderImageIterator()
     }
   })
 
@@ -124,6 +136,12 @@
     if (confirm("저장하시겠습니까?") === false) {
       return
     }
+
+    // title bind
+    menu.data.title.value = document.getElementById(
+      menu.data.title.id,
+    ).innerText
+    alert(menu.data.title.value)
 
     const response = await fetch(`/api/v1/menus/${menu.id}`, {
       method: "PUT",
@@ -244,26 +262,41 @@
   }
 
   async function handleUpload() {
-    const input = document.getElementById("file")
-    // input 요소 클릭 이벤트 트리거
-    input.click()
+    console.log("handleUpload")
+
+    if (focused.type === "title" && menu.data.title.src) {
+      console.log("remove title src")
+      menu.data.title.src = undefined
+      document.getElementById(menu.data.title.id).innerText =
+        menu.data.title.value
+    } else {
+      console.log("upload title src")
+      const input = document.getElementById("file")
+      input.click()
+    }
   }
 
   async function onChangedFileInput(e) {
     const file = e.target.files[0]
     if (file) {
-      const formData = new FormData()
-      formData.append("file", file)
-
       try {
+        const formData = new FormData()
+        formData.append("file", file)
+
         const response = await fetch("/api/v1/storage", {
           method: "POST",
           body: formData,
         })
         const result = await response.json()
+        const src = result.result.Location
 
-        const target = document.getElementById(focused.id)
-        target.innerHTML = `<img src="${result.result.Location}" />`
+        if (focused.type === "title") {
+          menu.data.title.src = src
+        } else {
+          focused.arr[focused.idx].src = src
+        }
+
+        await renderImageIterator()
       } catch (error) {
         console.error("Upload failed", error)
       }
@@ -272,6 +305,19 @@
 
   function delay(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
+  }
+
+  async function renderImageIterator() {
+    console.log("renderImageIterator")
+
+    if (isMounted && menu.data.title.src) {
+      await tick()
+      console.log("title has src", menu.data.title.src)
+      const target = document.getElementById(menu.data.title.id)
+      console.log(target)
+      target.innerText = ""
+      target.innerHTML = `<img src="${menu.data.title.src}" alt="${menu.data.title.value}" />`
+    }
   }
 </script>
 
@@ -293,7 +339,9 @@
 
 <div id="toolbox" class="hidden">
   {#if focused.type === "title"}
-    <button on:mousedown|preventDefault={handleUpload}>🖼️</button>
+    <button on:mousedown|preventDefault={handleUpload}>
+      {menu.data.title.src ? "🔄" : "🖼️"}
+    </button>
   {:else}
     <button on:mousedown|preventDefault={() => move(-1)}>🔼</button>
     <button on:mousedown|preventDefault={() => move(1)}>🔽</button>
@@ -310,7 +358,7 @@
       contenteditable="true"
       on:focus={() => focus({ type: "title", id: menu.data.title.id })}
       on:blur={blur}
-      bind:innerText={menu.data.title.value}
+      innerText={menu.data.title.value}
     />
   </section>
 

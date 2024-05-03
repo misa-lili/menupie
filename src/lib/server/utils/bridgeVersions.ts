@@ -4,6 +4,15 @@
  * @returns
  */
 export default function bridgeVersions(data: MenuData): MenuData {
+  // current version
+  data.version = 2
+
+  // delete legacy options
+  // @ts-ignore
+  delete data.options
+  // @ts-ignore
+  delete data.title.image
+
   data.title.id = data.title.id ?? crypto.randomUUID()
 
   data.headers = data.headers.map((header) => {
