@@ -353,6 +353,9 @@
 
 <main>
   <section>
+    <!--  
+      // TODO: data를 bind 말고, DOM에서 격리적으로 사용하다가 필요하면 id로 찾아서 사용하도록 변경
+    -->
     <h1
       id={menu.data.title.id}
       contenteditable="true"
